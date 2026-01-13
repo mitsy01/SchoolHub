@@ -68,7 +68,7 @@ def update_profile(request: HttpRequest):
     return render(
         request,
         "profile.html",
-        dict(user_form=UserFormEdit(instance=request.user), profile_form=UserProfile(isinstance=request.user.profile))
+        dict(user_form=UserFormEdit(instance=request.user), profile_form=UserProfileForm(instance=request.user.profile))
     )
     
     

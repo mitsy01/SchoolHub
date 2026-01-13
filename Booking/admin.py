@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Status, Booking, BookingLog, Action
+
+
+admin.site.register([Status, Booking, BookingLog, Action])
