@@ -50,7 +50,7 @@ class SubjectForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        exclude = ["user", "position"]
+        exclude = ["user", "positions", "classroom"]
         
 
 class SignInForm(forms.Form):

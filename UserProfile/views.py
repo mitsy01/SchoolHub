@@ -1,3 +1,6 @@
+import locale
+from datetime import datetime
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -5,8 +8,13 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 
+
 from .models import UserProfile, Action, Position, Subject
 from .forms import UserForm, UserFormEdit, SignInForm, ActionForm, SubjectForm, PositionForm, UserProfileForm
+from TaskManager.models import Schedule
+
+
+locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
 
 
 def sign_up(request: HttpRequest):
@@ -74,11 +82,17 @@ def update_profile(request: HttpRequest):
     
 @login_required
 def index(request: HttpRequest):
+    if (User.objects.prefetch_related("UserProfile").prefetch_related("Position").filter(username=request.user.username, profile__positions__name__in=["Учень", "Вчитель"]).exists()):
+            class_number = int(request.user.profile.classroom.name.split("-")[0])
+            day = datetime.now().strftime("%A").title()
+
+            task = Schedule.objects.filter(day=day, study=class_number)
+            return render(request, "index.html", dict(task=task))
     return render(request, "index.html")
 
 
 @login_required
 def logout_view(request:HttpRequest):
     logout(request)
-    messages.success(request,"Ви  вийшли із системи")
+    messages.success(request,"Ви вийшли із системи")
     return redirect("sign_in")

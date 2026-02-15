@@ -18,14 +18,14 @@ class ActionForm(forms.ModelForm):
 
 
 class BookingForm(forms.ModelForm):
+    start_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"type": "datetime-local"}), label="Час початку бронювання")
+    end_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"type": "datetime-local"}), label="Час початку бронювання")
     class Meta:
         model = Booking
         exclude = ["user", "created_at", "reason", "status"]
         
         
 class BookingAdminForm(forms.ModelForm):
-    start_time = forms.DateTimeField(disabled=True)
-    end_time = forms.DateTimeField(disabled=True)
     class Meta:
         model = Booking
         fields = ["status", "reason"]
