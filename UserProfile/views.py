@@ -17,77 +17,101 @@ from TaskManager.models import Schedule
 locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
 
 
-def sign_up(request: HttpRequest):
+def sign_up(request):
+    if request.user.is_authenticated:
+        return redirect("index")
+
     if request.method == "POST":
-        sign_up_form = UserForm(request.POST)
-        profile_form = UserProfileForm(data=request.POST, files=request.FILES)
-        if sign_up_form.is_valid():
-            user = sign_up_form.save()
-            if profile_form.is_valid():
-                profile = profile_form.save(commit=False)
-                profile.user = user
-                profile.save()
-            else:
-                profile = UserProfile(user=user)
-                profile.save()
-                
-            messages.success(request, "Вітаємо у SchoolHub")
-            return redirect("sign_in")
-        
-        messages.error(request, sign_up_form.errors)
-    return render(request, "sign_up.html", dict(sign_up_form=UserForm(), profile_form=UserProfileForm()))
+        user_form = UserForm(request.POST)
+        profile_form = UserProfileForm(request.POST, request.FILES)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            login(request, user)  # одразу логін
+            messages.success(request, "Реєстрація пройшла успішно!")
+            return redirect("index")
+        else:
+            messages.error(request, "Будь ласка, виправте помилки у формі.")
+    else:
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    return render(request, "sign_up.html", {
+        "sign_up_form": user_form,
+        "profile_form": profile_form
+    })
 
 
-def sign_in(request: HttpRequest):
+def sign_in(request):
+    if request.user.is_authenticated:
+        return redirect("index")
+
     if request.method == "POST":
         form = SignInForm(request.POST)
         if form.is_valid():
             user = authenticate(
-                username = form.cleaned_data.get('username'),
-                password=form.cleaned_data.get('password')
+                username=form.cleaned_data.get("username"),
+                password=form.cleaned_data.get("password")
             )
-            print(form.cleaned_data.get('username'))
-            print(form.cleaned_data.get('password'))
             if user:
                 login(request, user)
-                messages.success(request, "Вітаємо!")
+                messages.success(request, f"Вітаємо, {user.username}!")
                 return redirect("index")
             else:
-                messages.error(request, "Користувача з такими параметрами не знайдено") 
-            
-        messages.error(request, form.errors)
-        return redirect("sign_in")
-    
-    return render(request, "sign_in.html", dict(form=SignInForm()))
+                messages.error(request, "Невірний логін або пароль")
+    else:
+        form = SignInForm()
+
+    return render(request, "sign_in.html", {"form": form})
 
 
-def update_profile(request: HttpRequest):
+@login_required
+def update_profile(request):
+    user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
+
     if request.method == "POST":
-        user_form = UserFormEdit(data=request.POST, instance=request.user)
-        if user_form.changed_data:
-            user_form.save()
+        user_form = UserFormEdit(request.POST, instance=user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
 
-        profile_form = UserProfile(data=request.POST, files=request.FILES, isinstance=request.user.profile)
-        if profile_form.changed_data:
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
             profile_form.save()
-            
-        messages.success(request, "Дані оновлено")
-        return redirect("profile")
-    return render(
-        request,
-        "profile.html",
-        dict(user_form=UserFormEdit(instance=request.user), profile_form=UserProfileForm(instance=request.user.profile))
-    )
-    
-    
+            messages.success(request, "Дані оновлено")
+            return redirect("profile")
+    else:
+        user_form = UserFormEdit(instance=user)
+        profile_form = UserProfileForm(instance=profile)
+
+    return render(request, "profile.html", {
+        "user_form": user_form,
+        "profile_form": profile_form
+    })
+
+
 @login_required
 def index(request: HttpRequest):
-    if (User.objects.prefetch_related("UserProfile").prefetch_related("Position").filter(username=request.user.username, profile__positions__name__in=["Учень", "Вчитель"]).exists()):
-            class_number = int(request.user.profile.classroom.name.split("-")[0])
-            day = datetime.now().strftime("%A").title()
+    if User.objects.prefetch_related("UserProfile").prefetch_related("Position") \
+        .filter(
+            username=request.user.username,
+            profile__positions__name__in=["Учень", "Вчитель"]
+        ).exists():
 
-            task = Schedule.objects.filter(day=day, study=class_number)
-            return render(request, "index.html", dict(task=task))
+        profile = request.user.profile
+
+        if not profile.classroom:
+            return render(request, "index.html")
+
+        class_number = int(profile.classroom.name.split("-")[0])
+        day = datetime.now().strftime("%A").title()
+
+        task = Schedule.objects.filter(day=day, study=class_number)
+        return render(request, "index.html", {"task": task})
+
     return render(request, "index.html")
 
 

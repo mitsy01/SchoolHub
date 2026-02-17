@@ -4,6 +4,17 @@
 
 
 {% block content %}
+
+<div class="card p-3 mb-3">
+    <form action="{% url 'schedule_view_filtered' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="day" placeholder="День" class="form-control mb-2">
+        <input type="text" name="study" placeholder="Клас" class="form-control mb-2">
+        <button class="btn btn-warning w-100">Фільтрувати</button>
+    </form>
+</div>
+
+
 <form action="{% url 'schedule_view_filtered' %}" method="post">
     {% csrf_token %}
     <p>

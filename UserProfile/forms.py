@@ -19,14 +19,30 @@ class UserForm(UserCreationForm):
 
         
 class UserFormEdit(forms.ModelForm):
-    username = forms.CharField(max_length=50, min_length=2, help_text="Введіть логін", label="Логін")
-    first_name = forms.CharField(min_length=2, max_length=50, help_text="Введіть ім'я")
-    last_name = forms.CharField(max_length=100, min_length=2, help_text="Введіть прізвище", label="Прізвище")
-    email = forms.EmailField(required=False, help_text="Введіть адресу електроню пошти")
+    username = forms.CharField(
+        max_length=50,
+        min_length=2,
+        widget=forms.TextInput(attrs={"placeholder": "Введіть логін"})
+    )
+    first_name = forms.CharField(
+        min_length=2,
+        max_length=50,
+        widget=forms.TextInput(attrs={"placeholder": "Введіть ім'я"})
+    )
+    last_name = forms.CharField(
+        max_length=100,
+        min_length=2,
+        widget=forms.TextInput(attrs={"placeholder": "Введіть прізвище"})
+    )
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={"placeholder": "Введіть email"})
+    )
 
-    class Meta: 
+    class Meta:
         model = User
         fields = ["username", "first_name", "last_name", "email"]
+
         
         
 class ActionForm(forms.ModelForm):
@@ -51,6 +67,12 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         exclude = ["user", "positions", "classroom"]
+        widgets = {
+            "phone_number": forms.TextInput(attrs={"placeholder": "Введіть номер телефону", "class": "form-control"}),
+            "bio": forms.Textarea(attrs={"placeholder": "Про себе", "class": "form-control"}),
+            "avatar": forms.FileInput(attrs={"class": "form-control"})
+        }
+
         
 
 class SignInForm(forms.Form):

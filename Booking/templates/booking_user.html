@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h1>Бронювання кабінету</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_div }}
-    <button type = "submit" class = "btn btn-primary">Забронювати</button>
-</form>
-{% endblock content %}
+<div class="form-wrapper">
+    <h2 class="text-center">Бронювання кабінету</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button class="btn btn-primary w-100">Забронювати</button>
+    </form>
+</div>
+{% endblock %}

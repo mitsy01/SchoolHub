@@ -1,19 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Бронювання кабінету</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_div }}
-    <div>
-        <label>Час початку бронювання</label>
-        <p>{{ book.start_time }}</p>
-    </div>
+<div class="container">
+    <h2>Редагування бронювання</h2>
 
-    <div>
-        <label>Час завершення бронювання</label>
-        <p>{{ book.end_time }}</p>
-    </div>
-    <button type = "submit" class = "btn btn-primary">Зберегти</button>
-</form>
-{% endblock content %}
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            {{ form.status }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.reason }}
+        </div>
+
+        <hr>
+
+        <div>
+            <label class="label-title">Обʼєкт</label>
+            <p>{{ book.resource }}</p>
+        </div>
+
+        <div>
+            <label class="label-title">Час початку бронювання</label>
+            <p>{{ book.start_time }}</p>
+        </div>
+
+        <div>
+            <label class="label-title">Час завершення бронювання</label>
+            <p>{{ book.end_time }}</p>
+        </div>
+
+        <div>
+            <label class="label-title">Додаткова інформація</label>
+            <p>{{ book.description }}</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Зберегти</button>
+    </form>
+</div>
+{% endblock %}

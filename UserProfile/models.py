@@ -55,3 +55,7 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"Користувач: {self.user.get_full_name()}|{self.classroom}"
+
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)

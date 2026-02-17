@@ -1,15 +1,45 @@
-{%  extends "base.html" %}
+{% extends "base.html" %}
+{% block title %}Профіль{% endblock %}
 
-{% block title %}Пофіль{% endblock title %}
-{% block content  %}
-<h1>Тут ви можете змініти інформацію про себе.</h1>
-{% if request.user.profile.avatar %}
-    <img src="{{ MEDIA_URL }}{{ request.user.profile.avatar }}" alt="avatar" height="150px">
-{% endif %}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    {{   profile_form.as_p }}
-    <button class="btn btn-primary" type="submit">Оновити</button>
-</form>
-{% endblock content %}
+{% block content %}
+<div class="container mt-3">
+    <h2>Мій профіль</h2>
+
+    {% if request.user.profile.avatar %}
+        <img src="{{ MEDIA_URL }}{{ request.user.profile.avatar }}"
+             class="avatar mb-3" height="120">
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- User -->
+        <div class="mb-3">
+            {{ user_form.username }}
+        </div>
+        <div class="mb-3">
+            {{ user_form.first_name }}
+        </div>
+        <div class="mb-3">
+            {{ user_form.last_name }}
+        </div>
+        <div class="mb-3">
+            {{ user_form.email }}
+        </div>
+
+        <!-- Profile -->
+        <div class="mb-3">
+            {{ profile_form.phone_number }}
+        </div>
+        <div class="mb-3">
+            {{ profile_form.bio }}
+        </div>
+        <div class="mb-3">
+            {{ profile_form.avatar }}
+        </div>
+
+        <button class="btn btn-primary">Оновити</button>
+    </form>
+</div>
+{% endblock %}
+

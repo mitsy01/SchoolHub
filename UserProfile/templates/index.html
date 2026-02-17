@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-Інформація про наступне заняття та де воно буде
-{{ task }}
-{% endblock content %}
+<h1 class="mb-4">Панель учня</h1>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h5>Наступний урок</h5>
+      <p>{{ task }}</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h5>Мій клас</h5>
+      <p>{{ request.user.profile.study }}</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h5>Мій статус</h5>
+      <p>{{ request.user.is_staff|yesno:"Адмін,Користувач" }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

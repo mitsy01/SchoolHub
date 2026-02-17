@@ -1,10 +1,14 @@
 {% extends "base.html" %}
+{% block title %}Вхід{% endblock %}
 
-{% block title %}Вхід{% endblock title %}
 {% block content %}
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-primary">Вхід</button>
-</form>
-{% endblock content %}
+
+<div class="form-wrapper">
+    <h2 class="text-center">Вхід до SchoolHub</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary w-100">Увійти</button>
+    </form>
+</div>
+{% endblock %}

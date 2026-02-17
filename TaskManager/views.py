@@ -18,18 +18,27 @@ def schedule_view(request: HttpRequest):
 
 @has_permission("RS")
 @require_POST
-def schedule_view_filtered(request: HttpRequest):
-    day = request.POST.get("day")
-    study = request.POST.get("study")
-    if day and study:
-        schedule = Schedule.objects.filter(day=day, study=study).all()
-    elif day:
-        schedule_all = Schedule.objects.filter(day=day).all()
-    elif study:
-        schedule_all = Schedule.objects.filter(study=studt).all()
-    else:
-        schedule = []
-    return render(request, "schedule_view.html", dict(schedule=schedule))
+def schedule_view_filtered(request):
+    schedule = None
+    schedule_all = Schedule.objects.all()
+
+    if request.method == "POST":
+        day = request.POST.get("day")
+        study = request.POST.get("study")
+
+        if day and study:
+            schedule = Schedule.objects.filter(day=day, study=study)
+        elif day:
+            schedule = Schedule.objects.filter(day=day)
+        elif study:
+            schedule = Schedule.objects.filter(study=study)
+        else:
+            schedule = Schedule.objects.none()
+
+    return render(request, "schedule_view.html", {
+        "schedule": schedule,
+        "schedule_all": schedule_all,
+    })
 
 
 
